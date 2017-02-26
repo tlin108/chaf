@@ -11,17 +11,56 @@ import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Login.css';
 
+import { UsernameField, PasswordField } from '../../components/Auth';
+
 class Login extends React.Component {
   static propTypes = {
     title: PropTypes.string.isRequired,
   };
+
+  state = {
+    username: '',
+    password: '',
+  };
+
+  // Username helpers
+
+  onUsernameChange = (username) => {
+    this.setState({ username });
+  };
+
+  // Password helpers
+
+  onPasswordChange = (password) => {
+    this.setState({ password });
+  };
+
+  // Form helpers
+
+  onFormSubmit = (e) => {
+    e.preventDefault();
+
+    // testing for form submission
+    // const { username, password } = this.state;
+
+    // if (this.validateSubmission()) {
+    //   console.log('Submitting:', username, password);
+    // } else {
+
+    // }
+  };
+
+  // return true if submission passes log in requirements
+  validateSubmission = () => {
+    const { username, password } = this.state;
+    return username.length >= 5 && password.length >= 8;
+  }
 
   render() {
     return (
       <div className={s.root}>
         <div className={s.container}>
           <h1>{this.props.title}</h1>
-          <p className={s.lead}>Log in with your username or company email address.</p>
           <div className={s.formGroup}>
             <a className={s.facebook} href="/login/facebook">
               <svg
@@ -86,30 +125,30 @@ class Login extends React.Component {
           <strong className={s.lineThrough}>OR</strong>
           <form method="post">
             <div className={s.formGroup}>
-              <label className={s.label} htmlFor="usernameOrEmail">
-                Username or email address:
+              <label className={s.label} htmlFor="username">
+                Username:
               </label>
-              <input
+              <UsernameField
                 className={s.input}
-                id="usernameOrEmail"
-                type="text"
-                name="usernameOrEmail"
-                autoFocus
+                onUsernameChange={this.onUsernameChange}
               />
             </div>
             <div className={s.formGroup}>
               <label className={s.label} htmlFor="password">
                 Password:
               </label>
-              <input
+              <PasswordField
                 className={s.input}
-                id="password"
-                type="password"
-                name="password"
+                passwordType={'password'}
+                onPasswordChange={this.onPasswordChange}
               />
             </div>
             <div className={s.formGroup}>
-              <button className={s.button} type="submit">
+              <button
+                className={s.button}
+                type="submit"
+                onClick={this.onFormSubmit}
+              >
                 Log in
               </button>
             </div>
