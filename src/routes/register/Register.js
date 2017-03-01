@@ -9,7 +9,7 @@
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { reduxForm } from 'redux-form';
+import { Field, reduxForm } from 'redux-form';
 import s from './Register.css';
 
 const FIELDS = {
@@ -27,31 +27,32 @@ const FIELDS = {
   },
 };
 
+const validate = (values) => {
+  const errors = {};
+  if (!values.username) {
+    errors.username = 'Username Required';
+  } else if (values.username.length < 5) {
+    errors.username = 'Must be 5 characters or more';
+  }
+  if (!values.password) {
+    errors.password = 'Password Required';
+  } else if (values.password.length < 8) {
+    errors.password = 'Must be 8 characters or more';
+  }
+  if (!values.confirmPassword) {
+    errors.confirmPassword = 'Confirm Password Required';
+  } else if (values.confirmPassword !== values.password) {
+    errors.confirmPassword = 'Must be the same as password';
+  }
+  return errors;
+};
+
 class Register extends React.Component {
   static propTypes = {
     title: PropTypes.string.isRequired,
-  };
-
-  state = {
-    username: '',
-    password: '',
-    confirmPassword: '',
-  };
-
-  // Username helpers
-
-  onUsernameChange = (username) => {
-    this.setState({ username });
-  };
-
-  // Password helpers
-
-  onPasswordChange = (password) => {
-    this.setState({ password });
-  };
-
-  onConfirmPasswordChange = (confirmPassword) => {
-    this.setState({ confirmPassword });
+    handleSubmit: PropTypes.func.isRequired,
+    pristine: PropTypes.bool.isRequired,
+    submitting: PropTypes.bool.isRequired,
   };
 
   // Form helpers
@@ -69,37 +70,43 @@ class Register extends React.Component {
     // }
   };
 
-  // return true if submission passes all new user creation requirements
-  validateSubmission = () => {
-    const { username, password, confirmPassword } = this.state;
-    return username.length >= 5 && password.length >= 8 && password === confirmPassword;
-  }
+  renderInput = field => (
+    <div className={field.meta.touched && field.meta.error ? 'has-danger' : ''}>
+      <input {...field.input} type={field.type} className="form-control" />
+      {field.meta.touched &&
+           field.meta.error &&
+           <span className="form-control-feedback">{field.meta.error}</span>}
+    </div>
+      )
 
-  renderField = fieldConfig => (
-    <div key={fieldConfig.label} className={s.formGroup}>
-      <label className={s.label} htmlFor={fieldConfig.label}>
+  renderField = (fieldConfig, field) => (
+    <div key={fieldConfig.label} className="form-group">
+      <label className={`form-control-label ${s.label}`} htmlFor={fieldConfig.label}>
         {fieldConfig.label}
       </label>
-      <input
+      <Field
+        name={field}
+        component={this.renderInput}
         type={fieldConfig.type}
-        id={fieldConfig.label}
-        className={s.input}
+        className="form-control"
       />
     </div>
     )
 
   render() {
+    const { handleSubmit, pristine, submitting } = this.props;
+
     return (
       <div className={s.root}>
         <div className={s.container}>
           <h1>{this.props.title}</h1>
-          <form method="post">
+          <form onSubmit={handleSubmit(this.onFormSubmit)}>
             {_.map(FIELDS, this.renderField)}
             <div className={s.formGroup}>
               <button
                 className={s.button}
                 type="submit"
-                onClick={this.onFormSubmit}
+                disabled={pristine || submitting}
               >
                 Sign up
               </button>
@@ -113,5 +120,5 @@ class Register extends React.Component {
 
 export default withStyles(s)(reduxForm({
   form: 'registerUser',
-  fields: _.keys(FIELDS),
+  validate,
 })(Register));
