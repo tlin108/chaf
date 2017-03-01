@@ -16,10 +16,12 @@ const FIELDS = {
   username: {
     type: 'input',
     label: 'Username:',
+    requirement: 'Minimum 5 Characters',
   },
   password: {
     type: 'password',
     label: 'Password:',
+    requirement: 'Minimum 8 Characters',
   },
   confirmPassword: {
     type: 'password',
@@ -90,6 +92,7 @@ class Register extends React.Component {
         type={fieldConfig.type}
         className="form-control"
       />
+      <small className="form-text text-muted">{fieldConfig.requirement ? fieldConfig.requirement : ''}</small>
     </div>
     )
 
