@@ -74,6 +74,14 @@ app.get('/login/facebook/return',
   },
 );
 
+app.post('/register', (req, res) => {
+  res.send(req.body);
+});
+
+app.post('/login', (req, res) => {
+  res.send(req.body);
+});
+
 //
 // Register API middleware
 // -----------------------------------------------------------------------------

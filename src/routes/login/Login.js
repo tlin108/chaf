@@ -42,24 +42,8 @@ const validate = (values) => {
 class Login extends React.Component {
   static propTypes = {
     title: PropTypes.string.isRequired,
-    handleSubmit: PropTypes.func.isRequired,
     pristine: PropTypes.bool.isRequired,
     submitting: PropTypes.bool.isRequired,
-  };
-
-  // Form helpers
-
-  onFormSubmit = () => {
-    // console.log('logging in');
-
-    // testing for form submission
-    // const { username, password } = this.state;
-
-    // if (this.validateSubmission()) {
-    //   console.log('Submitting:', username, password);
-    // } else {
-
-    // }
   };
 
   renderInput = field => (
@@ -87,7 +71,7 @@ class Login extends React.Component {
   )
 
   render() {
-    const { handleSubmit, pristine, submitting } = this.props;
+    const { pristine, submitting } = this.props;
 
     return (
       <div className={s.root}>
@@ -155,7 +139,7 @@ class Login extends React.Component {
             </a>
           </div>
           <strong className={s.lineThrough}>OR</strong>
-          <form onSubmit={handleSubmit(this.onFormSubmit)}>
+          <form method="post">
             {_.map(FIELDS, this.renderField)}
             <div className={s.formGroup}>
               <button
