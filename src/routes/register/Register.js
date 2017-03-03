@@ -52,8 +52,31 @@ const validate = (values) => {
 class Register extends React.Component {
   static propTypes = {
     title: PropTypes.string.isRequired,
+    handleSubmit: PropTypes.func.isRequired,
     pristine: PropTypes.bool.isRequired,
     submitting: PropTypes.bool.isRequired,
+  };
+
+  onFormSubmit = (e) => {
+      // console.log('logging in');
+
+      // testing for form submission
+      // const { username, password } = this.state;
+      // }
+    fetch('/register', {
+      method: 'post',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: {
+          username: e.username,
+          password: e.password,
+        },
+      }),
+      credentials: 'include',
+    });
   };
 
   renderInput = field => (
@@ -81,13 +104,13 @@ class Register extends React.Component {
   )
 
   render() {
-    const { pristine, submitting } = this.props;
+    const { handleSubmit, pristine, submitting } = this.props;
 
     return (
       <div className={s.root}>
         <div className={s.container}>
           <h1>{this.props.title}</h1>
-          <form method="post">
+          <form onSubmit={handleSubmit(this.onFormSubmit)}>
             {_.map(FIELDS, this.renderField)}
             <div className={s.formGroup}>
               <button

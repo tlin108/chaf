@@ -75,10 +75,12 @@ app.get('/login/facebook/return',
 );
 
 app.post('/register', (req, res) => {
+  // console.log(req.body);
   res.send(req.body);
 });
 
 app.post('/login', (req, res) => {
+  // console.log(req.body);
   res.send(req.body);
 });
 

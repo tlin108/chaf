@@ -42,8 +42,31 @@ const validate = (values) => {
 class Login extends React.Component {
   static propTypes = {
     title: PropTypes.string.isRequired,
+    handleSubmit: PropTypes.func.isRequired,
     pristine: PropTypes.bool.isRequired,
     submitting: PropTypes.bool.isRequired,
+  };
+
+  onFormSubmit = (e) => {
+      // console.log('logging in');
+
+      // testing for form submission
+      // const { username, password } = this.state;
+      // }
+    fetch('/register', {
+      method: 'post',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: {
+          username: e.username,
+          password: e.password,
+        },
+      }),
+      credentials: 'include',
+    });
   };
 
   renderInput = field => (
@@ -71,7 +94,7 @@ class Login extends React.Component {
   )
 
   render() {
-    const { pristine, submitting } = this.props;
+    const { handleSubmit, pristine, submitting } = this.props;
 
     return (
       <div className={s.root}>
@@ -139,7 +162,7 @@ class Login extends React.Component {
             </a>
           </div>
           <strong className={s.lineThrough}>OR</strong>
-          <form method="post">
+          <form onSubmit={handleSubmit(this.onFormSubmit)}>
             {_.map(FIELDS, this.renderField)}
             <div className={s.formGroup}>
               <button
