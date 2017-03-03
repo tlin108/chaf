@@ -59,8 +59,8 @@ class Register extends React.Component {
 
   // Form helpers
 
-  onFormSubmit = (e) => {
-    e.preventDefault();
+  onFormSubmit = () => {
+    // console.log('submitting');
 
     // testing for form submission
     // const { username, password } = this.state;
@@ -79,7 +79,7 @@ class Register extends React.Component {
            field.meta.error &&
            <span className="form-control-feedback">{field.meta.error}</span>}
     </div>
-      )
+  )
 
   renderField = (fieldConfig, field) => (
     <div key={fieldConfig.label} className="form-group">
@@ -94,7 +94,7 @@ class Register extends React.Component {
       />
       <small className="form-text text-muted">{fieldConfig.requirement ? fieldConfig.requirement : ''}</small>
     </div>
-    )
+  )
 
   render() {
     const { handleSubmit, pristine, submitting } = this.props;

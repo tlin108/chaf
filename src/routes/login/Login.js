@@ -7,38 +7,50 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
+import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import { Field, reduxForm } from 'redux-form';
 import s from './Login.css';
 
-import { UsernameField, PasswordField } from '../../components/Auth';
+const FIELDS = {
+  username: {
+    type: 'input',
+    label: 'Username:',
+  },
+  password: {
+    type: 'password',
+    label: 'Password:',
+  },
+};
+
+const validate = (values) => {
+  const errors = {};
+  if (!values.username) {
+    errors.username = 'Username Required';
+  } else if (values.username.length < 5) {
+    errors.username = 'Invalid Username';
+  }
+  if (!values.password) {
+    errors.password = 'Password Required';
+  } else if (values.password.length < 8) {
+    errors.password = 'Invalid Password';
+  }
+  return errors;
+};
 
 class Login extends React.Component {
   static propTypes = {
     title: PropTypes.string.isRequired,
-  };
-
-  state = {
-    username: '',
-    password: '',
-  };
-
-  // Username helpers
-
-  onUsernameChange = (username) => {
-    this.setState({ username });
-  };
-
-  // Password helpers
-
-  onPasswordChange = (password) => {
-    this.setState({ password });
+    handleSubmit: PropTypes.func.isRequired,
+    pristine: PropTypes.bool.isRequired,
+    submitting: PropTypes.bool.isRequired,
   };
 
   // Form helpers
 
-  onFormSubmit = (e) => {
-    e.preventDefault();
+  onFormSubmit = () => {
+    // console.log('logging in');
 
     // testing for form submission
     // const { username, password } = this.state;
@@ -50,13 +62,33 @@ class Login extends React.Component {
     // }
   };
 
-  // return true if submission passes log in requirements
-  validateSubmission = () => {
-    const { username, password } = this.state;
-    return username.length >= 5 && password.length >= 8;
-  }
+  renderInput = field => (
+    <div className={field.meta.touched && field.meta.error ? 'has-danger' : ''}>
+      <input {...field.input} type={field.type} className={s.input} />
+      {field.meta.touched &&
+           field.meta.error &&
+           <span className="form-control-feedback">{field.meta.error}</span>}
+    </div>
+  )
+
+  renderField = (fieldConfig, field) => (
+    <div key={fieldConfig.label} className="form-group">
+      <label className={`form-control-label ${s.label}`} htmlFor={fieldConfig.label}>
+        {fieldConfig.label}
+      </label>
+      <Field
+        name={field}
+        component={this.renderInput}
+        type={fieldConfig.type}
+        className="form-control"
+      />
+      <small className="form-text text-muted">{fieldConfig.requirement ? fieldConfig.requirement : ''}</small>
+    </div>
+  )
 
   render() {
+    const { handleSubmit, pristine, submitting } = this.props;
+
     return (
       <div className={s.root}>
         <div className={s.container}>
@@ -123,31 +155,13 @@ class Login extends React.Component {
             </a>
           </div>
           <strong className={s.lineThrough}>OR</strong>
-          <form method="post">
-            <div className={s.formGroup}>
-              <label className={s.label} htmlFor="username">
-                Username:
-              </label>
-              <UsernameField
-                className={s.input}
-                onUsernameChange={this.onUsernameChange}
-              />
-            </div>
-            <div className={s.formGroup}>
-              <label className={s.label} htmlFor="password">
-                Password:
-              </label>
-              <PasswordField
-                className={s.input}
-                passwordType={'password'}
-                onPasswordChange={this.onPasswordChange}
-              />
-            </div>
+          <form onSubmit={handleSubmit(this.onFormSubmit)}>
+            {_.map(FIELDS, this.renderField)}
             <div className={s.formGroup}>
               <button
                 className={s.button}
                 type="submit"
-                onClick={this.onFormSubmit}
+                disabled={pristine || submitting}
               >
                 Log in
               </button>
@@ -159,4 +173,7 @@ class Login extends React.Component {
   }
 }
 
-export default withStyles(s)(Login);
+export default withStyles(s)(reduxForm({
+  form: 'loginUser',
+  validate,
+})(Login));
