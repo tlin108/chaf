@@ -8,7 +8,6 @@
  */
 
 import React, { PropTypes } from 'react';
-import serialize from 'serialize-javascript';
 import { analytics } from '../config';
 
 class Html extends React.Component {
@@ -20,19 +19,16 @@ class Html extends React.Component {
       cssText: PropTypes.string.isRequired,
     }).isRequired),
     scripts: PropTypes.arrayOf(PropTypes.string.isRequired),
-    // eslint-disable-next-line react/forbid-prop-types
-    state: PropTypes.object,
     children: PropTypes.string.isRequired,
   };
 
   static defaultProps = {
     styles: [],
     scripts: [],
-    state: null,
   };
 
   render() {
-    const { title, description, styles, scripts, state, children } = this.props;
+    const { title, description, styles, scripts, children } = this.props;
     return (
       <html className="no-js" lang="en">
         <head>
@@ -57,13 +53,6 @@ class Html extends React.Component {
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{ __html: children }}
           />
-          {state && (
-            <script
-              // eslint-disable-next-line react/no-danger
-              dangerouslySetInnerHTML={{ __html:
-              `window.APP_STATE=${serialize(state, { isJSON: true })}` }}
-            />
-          )}
           {scripts.map(script => <script key={script} src={script} />)}
           {analytics.google.trackingId &&
             <script

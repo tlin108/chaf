@@ -23,15 +23,21 @@ import Html from './components/Html';
 import { ErrorPageWithoutStyle } from './routes/error/ErrorPage';
 import errorPageStyle from './routes/error/ErrorPage.css';
 import passport from './core/passport';
-import models from './data/models';
 import schema from './data/schema';
 import routes from './routes';
 import assets from './assets.json'; // eslint-disable-line import/no-unresolved
-import configureStore from './store/configureStore';
-import { setRuntimeVariable } from './actions/runtime';
-import { port, auth } from './config';
+import { port, auth, databaseUrl } from './config';
+
+import mongoose from 'mongoose';
+import flash from 'connect-flash';
+import morgan from 'morgan';
+import session from 'express-session';
+
 
 const app = express();
+
+// configuration ===============================================================
+mongoose.connect(databaseUrl); // connect to our database
 
 //
 // Tell any CSS tooling (such as Material UI) to use all vendor prefixes if the
@@ -51,28 +57,31 @@ app.use(bodyParser.json());
 //
 // Authentication
 // -----------------------------------------------------------------------------
-app.use(expressJwt({
-  secret: auth.jwt.secret,
-  credentialsRequired: false,
-  getToken: req => req.cookies.id_token,
+// required for passport
+app.use(session({
+  secret: 'iloveturtles', // session secret
+  resave: true,
+  saveUninitialized: true,
 }));
 app.use(passport.initialize());
+app.use(passport.session()); // persistent login sessions
+app.use(flash()); // use connect-flash for flash messages stored in session
 
 if (__DEV__) {
   app.enable('trust proxy');
 }
-app.get('/login/facebook',
-  passport.authenticate('facebook', { scope: ['email', 'user_location'], session: false }),
-);
+
+// facebook -------------------------------
+
+// send to facebook to do the authentication
+app.get('/login/facebook', passport.authenticate('facebook', { scope: 'email' }));
+
+// handle the callback after facebook has authenticated the user
 app.get('/login/facebook/return',
-  passport.authenticate('facebook', { failureRedirect: '/login', session: false }),
-  (req, res) => {
-    const expiresIn = 60 * 60 * 24 * 180; // 180 days
-    const token = jwt.sign(req.user, auth.jwt.secret, { expiresIn });
-    res.cookie('id_token', token, { maxAge: 1000 * expiresIn, httpOnly: true });
-    res.redirect('/');
-  },
-);
+  passport.authenticate('facebook', {
+    successRedirect: '/contact',
+    failureRedirect: '/',
+  }));
 
 //
 // Register API middleware
@@ -89,17 +98,6 @@ app.use('/graphql', expressGraphQL(req => ({
 // -----------------------------------------------------------------------------
 app.get('*', async (req, res, next) => {
   try {
-    const store = configureStore({
-      user: req.user || null,
-    }, {
-      cookie: req.headers.cookie,
-    });
-
-    store.dispatch(setRuntimeVariable({
-      name: 'initialNow',
-      value: Date.now(),
-    }));
-
     const css = new Set();
 
     // Global (context) variables that can be easily accessed from any React component
@@ -111,13 +109,9 @@ app.get('*', async (req, res, next) => {
         // eslint-disable-next-line no-underscore-dangle
         styles.forEach(style => css.add(style._getCss()));
       },
-      // Initialize a new Redux store
-      // http://redux.js.org/docs/basics/UsageWithReact.html
-      store,
     };
 
     const route = await UniversalRouter.resolve(routes, {
-      ...context,
       path: req.path,
       query: req.query,
     });
@@ -136,7 +130,6 @@ app.get('*', async (req, res, next) => {
       assets.vendor.js,
       assets.client.js,
     ];
-    data.state = context.store.getState();
     if (assets[route.chunk]) {
       data.scripts.push(assets[route.chunk].js);
     }
@@ -175,9 +168,8 @@ app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
 // Launch the server
 // -----------------------------------------------------------------------------
 /* eslint-disable no-console */
-models.sync().catch(err => console.error(err.stack)).then(() => {
-  app.listen(port, () => {
-    console.log(`The server is running at http://localhost:${port}/`);
-  });
+
+app.listen(port, () => {
+  console.log(`The server is running at http://localhost:${port}/`);
 });
 /* eslint-enable no-console */

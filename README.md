@@ -1,14 +1,3 @@
-## Chaf
-
-Have you ever wanted to tackle some challenges along with your friends, be it losing weight, eat spicy food or simply beat a game’s level. Or Maybe you want to overcome something on your own with friends watching and cheering for you? Chaf can do that for you!
-
-Users can create/customize challenges which they can share on their social media to let their friends know, have them join you as participants or spectators. Users must upload proofs either as pictures, or video or something to prove their progress.
-
-Team:
-- Tom (Tung Ling) Lin
-- Barry Balondo
-- John Villamar
-
 ## React Starter Kit — "[isomorphic](http://nerds.airbnb.com/isomorphic-javascript-future-web-apps/)" web app boilerplate &nbsp; <a href="https://github.com/kriasoft/react-starter-kit/stargazers"><img src="https://img.shields.io/github/stars/kriasoft/react-starter-kit.svg?style=social&label=Star&maxAge=3600" height="20"></a> <a href="https://twitter.com/ReactStarter"><img src="https://img.shields.io/twitter/follow/ReactStarter.svg?style=social&label=Follow&maxAge=3600" height="20"></a>
 
 [React Starter Kit](https://www.reactstarterkit.com) is an opinionated boilerplate for web
@@ -46,10 +35,13 @@ branches that you can use either as a reference or merge into your project:
   * [feature/redux](https://github.com/kriasoft/react-starter-kit/tree/feature/redux) — isomorphic
     Redux by [Pavel Lang](https://github.com/langpavel)
     (see [how to integrate Redux](./docs/recipes/how-to-integrate-redux.md)) (based on `master`)
+  * [feature/apollo](https://github.com/kriasoft/react-starter-kit/tree/feature/apollo) — isomorphic
+    Apollo Client by [Pavel Lang](https://github.com/langpavel)
+    (see [Tracking PR #1147](https://github.com/kriasoft/react-starter-kit/pull/1147)) (based on `feature/redux`)
   * [feature/react-intl](https://github.com/kriasoft/react-starter-kit/tree/feature/react-intl) —
     isomorphic Redux and React Intl by [Pavel Lang](https://github.com/langpavel)
     (see [how to integrate React Intl](./docs/recipes/how-to-integrate-react-intl.md)) (based on `feature/redux`)
-  * [feature/bootstrap3](https://github.com/kriasoft/react-starter-kit/tree/feature/bootstrap3) —
+  * [feature/bootstrap3](https://github.com/kriasoft/react-starter-kit/tree/feature/bootstrap3) ***unmaintained*** —
     Simplest possible integration of [react-bootstrap](https://react-bootstrap.github.io/)
     by [Pavel Lang](https://github.com/langpavel) (based on `master`)
 

@@ -12,7 +12,7 @@
 export const port = process.env.PORT || 3000;
 export const host = process.env.WEBSITE_HOSTNAME || `localhost:${port}`;
 
-export const databaseUrl = process.env.DATABASE_URL || 'sqlite:database.sqlite';
+export const databaseUrl = process.env.DATABASE_URL || 'mongodb://localhost:auth/auth';
 
 export const analytics = {
 
@@ -28,9 +28,11 @@ export const auth = {
   jwt: { secret: process.env.JWT_SECRET || 'React Starter Kit' },
 
   // https://developers.facebook.com/
-  facebook: {
-    id: process.env.FACEBOOK_APP_ID || '186244551745631',
-    secret: process.env.FACEBOOK_APP_SECRET || 'a970ae3240ab4b9b8aae0f9f0661c6fc',
+  facebookAuth: {
+    clientID: process.env.FACEBOOK_APP_ID || '232652210417707',
+    clientSecret: process.env.FACEBOOK_APP_SECRET || '9da4727ca038e2794345b7817175760f',
+    callbackURL: 'http://localhost:3001/login/return',
+    profileURL: 'https://graph.facebook.com/v2.5/me?fields=first_name,last_name,email',
   },
 
   // https://cloud.google.com/console/project

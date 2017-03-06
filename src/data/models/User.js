@@ -1,39 +1,31 @@
-/**
- * React Starter Kit (https://www.reactstarterkit.com/)
- *
- * Copyright © 2014-present Kriasoft, LLC. All rights reserved.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE.txt file in the root directory of this source tree.
- */
+// load the things we need
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt-nodejs';
 
-import DataType from 'sequelize';
-import Model from '../sequelize';
+// define the schema for our user model
+const userSchema = mongoose.Schema({
 
-const User = Model.define('User', {
-
-  id: {
-    type: DataType.UUID,
-    defaultValue: DataType.UUIDV1,
-    primaryKey: true,
+  local: {
+    email: String,
+    password: String,
   },
-
-  email: {
-    type: DataType.STRING(255),
-    validate: { isEmail: true },
+  facebook: {
+    id: String,
+    token: String,
+    email: String,
+    name: String,
   },
-
-  emailConfirmed: {
-    type: DataType.BOOLEAN,
-    defaultValue: false,
-  },
-
-}, {
-
-  indexes: [
-    { fields: ['email'] },
-  ],
-
 });
 
+// generating a hash
+userSchema.methods.generateHash =
+    (password) => {
+      bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+    };
+
+// checking if password is valid
+userSchema.methods.validPassword = password => bcrypt.compareSync(password, this.local.password);
+
+// create the model for users and expose it to our app
+const User = mongoose.model('User', userSchema);
 export default User;
