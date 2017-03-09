@@ -8,4 +8,4 @@ ncp-debug.log
 npm-debug.log
 stats.json
 report.html
-/config.js
+src/config.js
