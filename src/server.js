@@ -18,18 +18,21 @@ import React from 'react';
 import ReactDOM from 'react-dom/server';
 import UniversalRouter from 'universal-router';
 import PrettyError from 'pretty-error';
+import { MongoClient } from 'mongodb';
+import promise from 'bluebird';
 import App from './components/App';
 import Html from './components/Html';
 import { ErrorPageWithoutStyle } from './routes/error/ErrorPage';
 import errorPageStyle from './routes/error/ErrorPage.css';
 import passport from './core/passport';
-import models from './data/models';
+// import models from './data/models';
 import schema from './data/schema';
 import routes from './routes';
 import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 import configureStore from './store/configureStore';
 import { setRuntimeVariable } from './actions/runtime';
-import { port, auth } from './config';
+import { port, auth, databaseUrl } from './config';
+
 
 const app = express();
 
@@ -170,14 +173,50 @@ app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   res.status(err.status || 500);
   res.send(`<!doctype html>${html}`);
 });
+// DB Connection
+
+// mongoose.connect('mongodb://localhost:27017/chaf', function (err, result) {
+//   if (err){
+//     console.log("error: " + err);
+//   }
+//   else {
+//     console.log("connected to mongodb server");
+//   }
+// });
+//
+// var userSchema = mongoose.Schema({
+//   name: String,
+//   username: String,
+//   password: String
+// });
+//
+// var User = mongoose.model('User', userSchema);
+// var joneDoe = new User({
+//   name: "John Doe",
+//   username: "johnny",
+//   password: "aPassword"
+// });
+// joneDoe.save(function (err) {
+//   if (err){
+//     console.log("error on save!");
+//   }
+// });
 
 //
 // Launch the server
 // -----------------------------------------------------------------------------
 /* eslint-disable no-console */
-models.sync().catch(err => console.error(err.stack)).then(() => {
-  app.listen(port, () => {
-    console.log(`The server is running at http://localhost:${port}/`);
+// models.sync().catch(err => console.error(err.stack)).then(() => {
+//   app.listen(port, () => {
+//     console.log(`The server is running at http://localhost:${port}/`);
+//   });
+// });
+MongoClient.connect(databaseUrl, { promiseLibrary: promise })
+  .catch(err => console.error(err.stack))
+  .then((db) => {
+    app.locals.db = db;
+    app.listen(port, () => {
+      console.log(`The server is running at http://localhost:${port}`);
+    });
   });
-});
 /* eslint-enable no-console */
