@@ -12,7 +12,7 @@
 export const port = process.env.PORT || 3000;
 export const host = process.env.WEBSITE_HOSTNAME || `localhost:${port}`;
 
-export const databaseUrl = process.env.DATABASE_URL || 'sqlite:database.sqlite';
+export const databaseUrl = process.env.DATABASE_URL || 'mongodb://tlinBb:NKFMktKIVBJJLQk4@cluster0-shard-00-00-jzd1t.mongodb.net:27017,cluster0-shard-00-01-jzd1t.mongodb.net:27017,cluster0-shard-00-02-jzd1t.mongodb.net:27017/Chaf?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin';
 
 export const analytics = {
 
