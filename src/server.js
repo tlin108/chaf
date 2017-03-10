@@ -61,7 +61,7 @@ if (__DEV__) {
   app.enable('trust proxy');
 }
 app.get('/login/facebook',
-  passport.authenticate('facebook', { scope: ['email', 'user_location'], session: false }),
+  passport.authenticate('facebook', { scope: ['email', 'user_location', 'user_friends'], session: false }),
 );
 app.get('/login/facebook/return',
   passport.authenticate('facebook', { failureRedirect: '/login', session: false }),

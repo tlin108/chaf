@@ -15,8 +15,15 @@
 
 import passport from 'passport';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
-import { User, UserLogin, UserClaim, UserProfile } from '../data/models';
 import { auth as config } from '../config';
+
+// serialize and deserialize
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+passport.deserializeUser((obj, done) => {
+  done(null, obj);
+});
 
 /**
  * Sign in with Facebook.
@@ -25,10 +32,12 @@ passport.use(new FacebookStrategy({
   clientID: config.facebook.id,
   clientSecret: config.facebook.secret,
   callbackURL: '/login/facebook/return',
-  profileFields: ['name', 'email', 'link', 'locale', 'timezone'],
+  profileFields: ['name', 'email', 'link', 'locale', 'timezone', 'user_friends'],
   passReqToCallback: true,
 }, (req, accessToken, refreshToken, profile, done) => {
+  process.nextTick(() => done(null, profile));
   /* eslint-disable no-underscore-dangle */
+  /*
   const loginName = 'facebook';
   const claimType = 'urn:facebook:access_token';
   const fooBar = async () => {
@@ -121,6 +130,7 @@ passport.use(new FacebookStrategy({
   };
 
   fooBar().catch(done);
+  */
 }));
 
 export default passport;
