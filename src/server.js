@@ -83,6 +83,11 @@ app.post('/login', (req, res) => {
   res.send(req.body);
 });
 
+app.get('/logout', (req, res) => {
+  req.logout();
+  res.redirect('/');
+});
+
 //
 // Register server-side rendering middleware
 // -----------------------------------------------------------------------------

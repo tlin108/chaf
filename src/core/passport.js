@@ -15,15 +15,8 @@
 
 import passport from 'passport';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
+import User from '../data/models/user';
 import { auth as config } from '../config';
-
-// serialize and deserialize
-passport.serializeUser((user, done) => {
-  done(null, user);
-});
-passport.deserializeUser((obj, done) => {
-  done(null, obj);
-});
 
 /**
  * Sign in with Facebook.
@@ -32,10 +25,34 @@ passport.use(new FacebookStrategy({
   clientID: config.facebook.id,
   clientSecret: config.facebook.secret,
   callbackURL: '/login/facebook/return',
-  profileFields: ['name', 'email', 'link', 'locale', 'timezone', 'user_friends'],
+  profileFields: ['name', 'email', 'link', 'locale', 'timezone'],
   passReqToCallback: true,
 }, (req, accessToken, refreshToken, profile, done) => {
-  process.nextTick(() => done(null, profile));
+  /* eslint-disable no-console */
+  User.findOne({ oauthID: profile.id }, (err, user) => {
+    if (err) {
+      console.log(err);  // handle errors!
+    }
+    if (!err && user !== null) {
+      console.log('logging in user ...');
+      done(null, user);
+    } else {
+      console.log('creating new user ...');
+      const newUser = new User({
+        oauthID: profile.id,
+        username: profile.name.givenName,
+        created: Date.now(),
+      });
+      newUser.save((saveUserErr) => {
+        if (saveUserErr) {
+          console.log(saveUserErr);  // handle errors!
+        } else {
+          console.log('saving user ...');
+          done(null, newUser);
+        }
+      });
+    }
+  });
   /* eslint-disable no-underscore-dangle */
   /*
   const loginName = 'facebook';
@@ -132,5 +149,19 @@ passport.use(new FacebookStrategy({
   fooBar().catch(done);
   */
 }));
+
+// serialize and deserialize
+passport.serializeUser((user, done) => {
+  console.log(`serializeUser: ${user._id}`);
+  done(null, user._id);
+});
+
+passport.deserializeUser((id, done) => {
+  User.findById(id, (err, user) => {
+    console.log(user);
+    if (!err) done(null, user);
+    else done(err, null);
+  });
+});
 
 export default passport;
