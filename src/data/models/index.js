@@ -7,3 +7,16 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
+import mongoose from 'mongoose';
+
+const schema = mongoose.Schema;
+
+const UserSchema = new schema({
+  username: String,
+  password: String,
+  date: { type: Date, Default: Date.now },
+});
+
+const UserModel = mongoose.model('User', UserSchema);
+
+export default UserModel;
