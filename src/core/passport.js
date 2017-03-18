@@ -16,7 +16,7 @@
 import passport from 'passport';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
-import { User, UserLogin, UserClaim, UserProfile } from '../data/models';
+import User from '../data/models';
 import { auth as config } from '../config';
 
 /**
@@ -29,7 +29,33 @@ passport.use(new FacebookStrategy({
   profileFields: ['name', 'email', 'link', 'locale', 'timezone'],
   passReqToCallback: true,
 }, (req, accessToken, refreshToken, profile, done) => {
+  /* eslint-disable no-console */
+  User.findOne({ oauthID: profile.id }, (err, user) => {
+    if (err) {
+      console.log(err);  // handle errors!
+    }
+    if (!err && user !== null) {
+      console.log('logging in user ...');
+      done(null, user);
+    } else {
+      console.log('creating new user ...');
+      const newUser = new User({
+        oauthID: profile.id,
+        username: profile.name.givenName,
+        created: Date.now(),
+      });
+      newUser.save((saveUserErr) => {
+        if (saveUserErr) {
+          console.log(saveUserErr);  // handle errors!
+        } else {
+          console.log('saving user ...');
+          done(null, newUser);
+        }
+      });
+    }
+  });
   /* eslint-disable no-underscore-dangle */
+  /*
   const loginName = 'facebook';
   const claimType = 'urn:facebook:access_token';
   const fooBar = async () => {
@@ -59,9 +85,9 @@ passport.use(new FacebookStrategy({
           },
         }, {
           include: [
-            // { model: UserLogin, as: 'logins' },
-            // { model: UserClaim, as: 'claims' },
-            // { model: UserProfile, as: 'profile' },
+            { model: UserLogin, as: 'logins' },
+            { model: UserClaim, as: 'claims' },
+            { model: UserProfile, as: 'profile' },
           ],
         });
         done(null, {
@@ -122,6 +148,7 @@ passport.use(new FacebookStrategy({
   };
 
   fooBar().catch(done);
+  */
 }));
 
 

@@ -62,7 +62,7 @@ if (__DEV__) {
   app.enable('trust proxy');
 }
 app.get('/login/facebook',
-  passport.authenticate('facebook', { scope: ['email', 'user_location'], session: false }),
+  passport.authenticate('facebook', { scope: ['email', 'user_location', 'user_friends'], session: false }),
 );
 app.get('/login/facebook/return',
   passport.authenticate('facebook', { failureRedirect: '/login', session: false }),
@@ -109,6 +109,11 @@ app.post('/login', (req, res) => {
     // console.log('Sending username and auth token to client');
     res.json({ user: result.username, auth: token });
   });
+});
+
+app.get('/logout', (req, res) => {
+  req.logout();
+  res.redirect('/');
 });
 
 //
