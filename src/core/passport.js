@@ -14,6 +14,7 @@
  */
 
 import passport from 'passport';
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
 import { User, UserLogin, UserClaim, UserProfile } from '../data/models';
 import { auth as config } from '../config';
@@ -58,9 +59,9 @@ passport.use(new FacebookStrategy({
           },
         }, {
           include: [
-            { model: UserLogin, as: 'logins' },
-            { model: UserClaim, as: 'claims' },
-            { model: UserProfile, as: 'profile' },
+            // { model: UserLogin, as: 'logins' },
+            // { model: UserClaim, as: 'claims' },
+            // { model: UserProfile, as: 'profile' },
           ],
         });
         done(null, {
@@ -123,4 +124,21 @@ passport.use(new FacebookStrategy({
   fooBar().catch(done);
 }));
 
+
+const opts = {};
+opts.jwtFromRequest = ExtractJwt.fromAuthHeader();
+opts.secretOrKey = config.jwt.secret;
+
+passport.use(new JwtStrategy(opts, (jwtPayload, done) => {
+  User.findOne({ id: jwtPayload.sub }, (err, user) => {
+    if (err) {
+      return done(err, false);
+    }
+    if (user) {
+      return done(null, user);
+    }
+
+    return done(null, false);
+  });
+}));
 export default passport;

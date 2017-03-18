@@ -53,7 +53,7 @@ class Login extends React.Component {
       // testing for form submission
       // const { username, password } = this.state;
       // }
-    fetch('/register', {
+    fetch('/login', {
       method: 'post',
       headers: {
         Accept: 'application/json',

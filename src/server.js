@@ -28,6 +28,7 @@ import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 import configureStore from './store/configureStore';
 import { setRuntimeVariable } from './actions/runtime';
 import { port, auth, databaseUrl } from './config';
+import User from './data/models';
 
 
 const app = express();
@@ -75,12 +76,39 @@ app.get('/login/facebook/return',
 
 app.post('/register', (req, res) => {
   // console.log(req.body);
+
+  const user = new User({
+    username: req.body.query.username,
+    password: req.body.query.password,
+  });
+  // console.log('created instance');
+  // console.log(`Adding user: ${user.username}`);
+  user.save((err) => {
+    if (err) {
+      res.json({ confirm: 'failed' });
+    }
+  });
+  // console.log('Saved User');
   res.send(req.body);
 });
 
 app.post('/login', (req, res) => {
   // console.log(req.body);
-  res.send(req.body);
+
+  User.findOne({ username: req.body.query.username }, (err, result) => {
+    if (err) { return; }
+
+    // console.log(`Found user: ${result}`);
+    // console.log(`username: ${result.username}`);
+
+    const expiresIn = 60 * 60 * 24; // 1 day
+    // console.log('creating token');
+    const token = jwt.sign(result, auth.jwt.secret, { expiresIn });
+    // console.log(`token is sign with: ${token}`);
+
+    // console.log('Sending username and auth token to client');
+    res.json({ user: result.username, auth: token });
+  });
 });
 
 //
